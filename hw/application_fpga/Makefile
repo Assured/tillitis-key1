@@ -34,7 +34,8 @@ TARGET_FREQ ?= 24
 # bits wide; an EBR is 128 32-bits words)
 BRAM_FW_SIZE ?= 2048
 
-PIN_FILE ?= application_fpga_tk1.pcf
+#PIN_FILE ?= application_fpga_tk1.pcf
+PIN_FILE ?= tkey_ecp5.pcf
 
 SIZE ?= llvm-size
 OBJCOPY ?= llvm-objcopy
@@ -394,13 +395,13 @@ synth.json: $(FPGA_VERILOG_SRCS) $(VERILOG_SRCS) $(PICORV32_SRCS) bram_fw.hex
 		$(filter %.v, $^)
 
 application_fpga_par.json: synth.json $(P)/data/$(PIN_FILE)
-	$(NEXTPNR_PATH)nextpnr-ice40 \
+	$(NEXTPNR_PATH)nextpnr-ecp5 \
 		-l application_fpga_par.txt \
 		--seed 18160564147838858264 \
 		--freq $(TARGET_FREQ) \
 		--ignore-loops \
-		--up5k \
-		--package sg48 \
+		--85k \
+		--package CSFBGA285 \
 		--json $< \
 		--pcf $(P)/data/$(PIN_FILE) \
 		--write $@ \
@@ -411,9 +412,9 @@ application_fpga.asc: application_fpga_par.json $(P)/data/uds.hex $(P)/data/udi.
 	UDS_HEX="$(P)/data/uds.hex" \
 	UDI_HEX="$(P)/data/udi.hex" \
 	OUT_ASC=$@ \
-	$(NEXTPNR_PATH)nextpnr-ice40 \
-		--up5k \
-		--package sg48 \
+	$(NEXTPNR_PATH)nextpnr-ecp5 \
+		--85k \
+		--package CSFBGA285 \
 		--ignore-loops \
 		--json $< \
 		--run tools/patch_uds_udi.py

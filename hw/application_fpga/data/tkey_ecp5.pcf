@@ -1,0 +1,67 @@
+#LOCATE COMP "clk48" SITE "A9";
+#IOBUF PORT "clk48" IO_TYPE=LVCMOS33;
+#FREQUENCY PORT "clk48" 48.0 MHz;
+
+LOCATE COMP "interface_rx" SITE "T17";
+IOBUF PORT "interface_rx" IO_TYPE=LVCMOS33;
+
+LOCATE COMP "interface_tx" SITE "N16";
+IOBUF PORT "interface_tx" IO_TYPE=LVCMOS33;
+
+LOCATE COMP "interface_ch552_cts" SITE "N15";
+IOBUF PORT "interface_ch552_cts" IO_TYPE=LVCMOS33;
+
+LOCATE COMP "interface_fpga_cts" SITE "M18";
+IOBUF PORT "interface_fpga_cts" IO_TYPE=LVCMOS33;
+
+LOCATE COMP "spi_ss" SITE "N17";
+IOBUF PORT "spi_ss" IO_TYPE=LVCMOS33;
+
+LOCATE COMP "spi_sck" SITE "B10";
+IOBUF PORT "spi_sck" IO_TYPE=LVCMOS33;
+
+LOCATE COMP "spi_mosi" SITE "B9";
+IOBUF PORT "spi_mosi" IO_TYPE=LVCMOS33;
+
+LOCATE COMP "spi_miso" SITE "C8";
+IOBUF PORT "spi_miso" IO_TYPE=LVCMOS33;
+
+LOCATE COMP "touch_event" SITE "B8";
+IOBUF PORT "touch_event" IO_TYPE=LVCMOS33;
+
+LOCATE COMP "app_gpio1" SITE "A8";
+IOBUF PORT "app_gpio1" IO_TYPE=LVCMOS33;
+
+LOCATE COMP "app_gpio2" SITE "H2";
+IOBUF PORT "app_gpio2" IO_TYPE=LVCMOS33;
+
+LOCATE COMP "app_gpio3" SITE "J2";
+IOBUF PORT "app_gpio3" IO_TYPE=LVCMOS33;
+
+LOCATE COMP "app_gpio4" SITE "L4";
+IOBUF PORT "app_gpio4" IO_TYPE=LVCMOS33;
+
+LOCATE COMP "led_r" SITE "K4";
+IOBUF PORT "led_r" IO_TYPE=LVCMOS33;
+LOCATE COMP "led_g" SITE "M3";
+IOBUF PORT "led_g" IO_TYPE=LVCMOS33;
+LOCATE COMP "led_b" SITE "J3";
+IOBUF PORT "led_b" IO_TYPE=LVCMOS33;
+
+#LOCATE COMP "eim_wait_n" SITE "N3";
+#IOBUF PORT "eim_wait_n" IO_TYPE=LVCMOS33;
+#
+#LOCATE COMP "eim_oe_n" SITE "H4";
+#IOBUF PORT "eim_oe_n" IO_TYPE=LVCMOS33;
+#
+#LOCATE COMP "eim_cs0_n" SITE "N4";
+#IOBUF PORT "eim_cs0_n" IO_TYPE=LVCMOS33;
+#
+#LOCATE COMP "eim_bclk" SITE "G4";
+#IOBUF PORT "eim_bclk" IO_TYPE=LVCMOS33;
+#
+#LOCATE COMP "eim_da_1" SITE "C9";
+#IOBUF PORT "eim_da_1" IO_TYPE=LVCMOS33;
+#
+#LOCATE COMP "eim_da_0" SITE "C10";
+#IOBUF PORT "eim_da_0" IO_TYPE=LVCMOS33;
