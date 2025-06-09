@@ -19,6 +19,7 @@
 module clk_reset_gen #(
     parameter RESET_CYCLES = 200
 ) (
+    input wire  clk_ref,
     input wire sys_reset,
 
     output wire clk,
@@ -45,61 +46,54 @@ module clk_reset_gen #(
   wire         hfosc_clk;
   wire         pll_clk;
 
+  wire        locked;
+  wire        clkout0;
 
   //----------------------------------------------------------------
   // Concurrent assignment.
   //----------------------------------------------------------------
   assign rst_n = rst_n_reg;
-
+  assign clk = clkout0;
 
   //----------------------------------------------------------------
   // Core instantiations.
   //----------------------------------------------------------------
   /* verilator lint_off PINMISSING */
-
-  // Use the FPGA internal High Frequency OSCillator as clock source.
-  // 00: 48MHz, 01: 24MHz, 10: 12MHz, 11: 6MHz
-  SB_HFOSC #(
-      .CLKHF_DIV("0b10")
-  ) hfosc_inst (
-      .CLKHFPU(1'b1),
-      .CLKHFEN(1'b1),
-      .CLKHF  (hfosc_clk)
-  );
-
-
-  // Use a PLL to generate a new clock frequency based on the HFOSC clock.
-  //
-  // Given FEEDBACK_PATH=="SIMPLE", clock calculation according to 3.5.2 in
-  // FPGA-TN-02052-1-4-iCE40-sysCLOCK-PLL-Design-User-Guide.pdf
-  // https://www.latticesemi.com/view_document?document_id=47778 follows:
-  //
-  // F_pllout == (F_referenceclk * (DIVF + 1)) / (2^DIVQ * (DIVR + 1))
-  //
-  // Given the 12 MHz HFOSC clock set above, we get a final 24 MHz:
-  //
-  // (12000000 * (63 + 1)) / (2^5 * (0 + 1)) = 24000000
-  SB_PLL40_CORE #(
-      .FEEDBACK_PATH("SIMPLE"),
-      .DIVR(4'd0),  // DIVR =  0
-      .DIVF(7'd63),  // DIVF = 63
-      .DIVQ(3'd5),  // DIVQ =  5
-      .FILTER_RANGE(3'b001)  // FILTER_RANGE = 1
-  ) pll_inst (
-      .RESETB(1'b1),
-      .BYPASS(1'b0),
-      .REFERENCECLK(hfosc_clk),
-      .PLLOUTCORE(pll_clk)
-  );
-
-
-  // Use a Global Buffer to distribute the clock.
-  SB_GB gb_inst (
-      .USER_SIGNAL_TO_GLOBAL_BUFFER(pll_clk),
-      .GLOBAL_BUFFER_OUTPUT(clk)
-  );
-
-  /* verilator lint_on PINMISSING */
+(* FREQUENCY_PIN_CLKI="48" *)
+(* FREQUENCY_PIN_CLKOP="48" *)
+(* ICP_CURRENT="12" *) (* LPF_RESISTOR="8" *) (* MFG_ENABLE_FILTEROPAMP="1" *) (* MFG_GMCREF_SEL="2" *)
+EHXPLLL #(
+        .PLLRST_ENA("DISABLED"),
+        .INTFB_WAKE("DISABLED"),
+        .STDBY_ENABLE("DISABLED"),
+        .DPHASE_SOURCE("DISABLED"),
+        .OUTDIVIDER_MUXA("DIVA"),
+        .OUTDIVIDER_MUXB("DIVB"),
+        .OUTDIVIDER_MUXC("DIVC"),
+        .OUTDIVIDER_MUXD("DIVD"),
+        .CLKI_DIV(1),
+        .CLKOP_ENABLE("ENABLED"),
+        .CLKOP_DIV(12),
+        .CLKOP_CPHASE(5),
+        .CLKOP_FPHASE(0),
+        .FEEDBK_PATH("CLKOP"),
+        .CLKFB_DIV(1)
+    ) pll_i (
+        .RST(1'b0),
+        .STDBY(1'b0),
+        .CLKI(clk_ref),
+        .CLKOP(clkout0),
+        .CLKFB(clkout0),
+        .CLKINTFB(),
+        .PHASESEL0(1'b0),
+        .PHASESEL1(1'b0),
+        .PHASEDIR(1'b1),
+        .PHASESTEP(1'b1),
+        .PHASELOADREG(1'b1),
+        .PLLWAKESYNC(1'b0),
+        .ENCLKOP(1'b0),
+        .LOCK(locked)
+	);
 
 
   //----------------------------------------------------------------
@@ -109,7 +103,9 @@ module clk_reset_gen #(
     rst_n_reg     <= rst_n_new;
     sys_reset_reg <= sys_reset;
 
-    if (rst_ctr_we) rst_ctr_reg <= rst_ctr_new;
+    if (rst_ctr_we) begin
+      rst_ctr_reg <= rst_ctr_new;
+    end
   end
 
 

@@ -390,34 +390,33 @@ synth.json: $(FPGA_VERILOG_SRCS) $(VERILOG_SRCS) $(PICORV32_SRCS) bram_fw.hex
 		$(YOSYS_FLAG) \
 		-DBRAM_FW_SIZE=$(BRAM_FW_SIZE) \
 		-DFIRMWARE_HEX=\"$(P)/bram_fw.hex\" \
-		-p 'synth_ice40 -abc2 -device u -dff -dsp -top application_fpga -json $@' \
+		-p 'synth_ecp5 -abc2 -dff -top application_fpga -json $@' \
 		-p 'write_verilog -attr2comment synth.v' \
 		$(filter %.v, $^)
 
-application_fpga_par.json: synth.json $(P)/data/$(PIN_FILE)
+application_fpga.asc: synth.json $(P)/data/$(PIN_FILE)
 	$(NEXTPNR_PATH)nextpnr-ecp5 \
 		-l application_fpga_par.txt \
-		--seed 18160564147838858264 \
 		--freq $(TARGET_FREQ) \
 		--ignore-loops \
 		--85k \
 		--package CSFBGA285 \
 		--json $< \
-		--pcf $(P)/data/$(PIN_FILE) \
+		--lpf $(P)/data/$(PIN_FILE) \
 		--write $@ \
 		&& {                                  exit 0; } \
 		|| { rm -f application_fpga_par.json; exit 1; }
 
-application_fpga.asc: application_fpga_par.json $(P)/data/uds.hex $(P)/data/udi.hex
-	UDS_HEX="$(P)/data/uds.hex" \
-	UDI_HEX="$(P)/data/udi.hex" \
-	OUT_ASC=$@ \
-	$(NEXTPNR_PATH)nextpnr-ecp5 \
-		--85k \
-		--package CSFBGA285 \
-		--ignore-loops \
-		--json $< \
-		--run tools/patch_uds_udi.py
+#application_fpga.asc: application_fpga_par.json $(P)/data/uds.hex $(P)/data/udi.hex
+#	UDS_HEX="$(P)/data/uds.hex" \
+#	UDI_HEX="$(P)/data/udi.hex" \
+#	OUT_ASC=$@ \
+#	$(NEXTPNR_PATH)nextpnr-ecp5 \
+#		--85k \
+#		--package CSFBGA285 \
+#		--ignore-loops \
+#		--json $<
+#		--run tools/patch_uds_udi.py
 
 application_fpga.bin: application_fpga.asc bram_fw.hex firmware.hex
 	$(ICESTORM_PATH)icebram -v bram_fw.hex firmware.hex < $< > $<.tmp

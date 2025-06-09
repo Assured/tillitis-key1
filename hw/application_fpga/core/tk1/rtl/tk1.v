@@ -197,27 +197,14 @@ module tk1 #(
 
   assign system_reset    = system_reset_reg;
 
+  assign led_r           = muxed_led[LED_R_BIT];
+  assign led_g           = muxed_led[LED_G_BIT];
+  assign led_b           = muxed_led[LED_B_BIT];
+
+
   //----------------------------------------------------------------
   // Module instance.
   //----------------------------------------------------------------
-  /* verilator lint_off PINMISSING */
-  SB_RGBA_DRV #(
-      .CURRENT_MODE("0b1"),       // half-current mode
-      .RGB0_CURRENT("0b000001"),  // 2 mA
-      .RGB1_CURRENT("0b000001"),  // 2 mA
-      .RGB2_CURRENT("0b000001")   // 2 mA
-  ) RGBA_DRV (
-      .RGB0(led_r),
-      .RGB1(led_g),
-      .RGB2(led_b),
-      .RGBLEDEN(1'h1),
-      .RGB0PWM(muxed_led[LED_R_BIT]),
-      .RGB1PWM(muxed_led[LED_G_BIT]),
-      .RGB2PWM(muxed_led[LED_B_BIT]),
-      .CURREN(1'b1)
-  );
-  /* verilator lint_on PINMISSING */
-
   tk1_spi_master spi_master (
       .clk(clk),
       .reset_n(reset_n),

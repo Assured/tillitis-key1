@@ -17,6 +17,8 @@
 `default_nettype none
 
 module application_fpga (
+    input wire  clk48,
+
     output wire interface_rx,
     input  wire interface_tx,
 
@@ -168,10 +170,11 @@ module application_fpga (
   clk_reset_gen #(
       .RESET_CYCLES(200)
   ) reset_gen_inst (
-      .sys_reset(tk1_system_reset),
-      .clk(clk),
-      .rst_n(reset_n)
-  );
+		    .clk_ref(clk48),
+		    .sys_reset(tk1_system_reset),
+		    .clk(clk),
+		    .rst_n(reset_n)
+		    );
 
 
   picorv32 #(

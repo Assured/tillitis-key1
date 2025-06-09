@@ -16,20 +16,25 @@ module udi_rom (
     input  wire [ 0:0] addr,
     output wire [31:0] data
 );
-  generate
-    genvar ii;
-    /* verilator lint_off PINMISSING */
-    for (ii = 0; ii < 32; ii = ii + 1'b1) begin : luts
 
-      (* udi_rom_idx=ii, keep *) SB_LUT4 #(
-          .LUT_INIT({2'h1})
-      ) lut_i (
-          .I0(addr[0]),
-          .O (data[ii])
-      );
-      /* verilator lint_on PINMISSING */
-    end
-  endgenerate
+  reg [31 : 0] udi_rom;
+
+  assign daa = udi_rom;
+
+//  generate
+//    genvar ii;
+//    /* verilator lint_off PINMISSING */
+//    for (ii = 0; ii < 32; ii = ii + 1'b1) begin : luts
+//
+//      (* udi_rom_idx=ii, keep *) SB_LUT4 #(
+//          .LUT_INIT({2'h1})
+//      ) lut_i (
+//          .I0(addr[0]),
+//          .O (data[ii])
+//      );
+//      /* verilator lint_on PINMISSING */
+//    end
+//  endgenerate
 endmodule
 
 //======================================================================

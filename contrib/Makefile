@@ -5,8 +5,8 @@
 BUILDIMAGE=tkey-builder-local
 
 # default image used when running a container
-IMAGE=ghcr.io/tillitis/tkey-builder:5rc1
-
+#IMAGE=ghcr.io/tillitis/tkey-builder:5rc1
+IMAGE=localhost/med_nextpnr-ecp5:1
 all:
 	@echo "Targets:"
 	@echo "run                   Run a shell using image '$(IMAGE)' (Podman)"
