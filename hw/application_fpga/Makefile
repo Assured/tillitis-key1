@@ -394,39 +394,26 @@ synth.json: $(FPGA_VERILOG_SRCS) $(VERILOG_SRCS) $(PICORV32_SRCS) bram_fw.hex
 		-p 'write_verilog -attr2comment synth.v' \
 		$(filter %.v, $^)
 
-application_fpga.asc: synth.json $(P)/data/$(PIN_FILE)
+application_fpga.config: synth.json $(P)/data/$(PIN_FILE)
 	$(NEXTPNR_PATH)nextpnr-ecp5 \
-		-l application_fpga_par.txt \
 		--freq $(TARGET_FREQ) \
 		--ignore-loops \
 		--85k \
 		--package CSFBGA285 \
 		--json $< \
 		--lpf $(P)/data/$(PIN_FILE) \
-		--write $@ \
-		&& {                                  exit 0; } \
-		|| { rm -f application_fpga_par.json; exit 1; }
+		-l $@.txt \
+		--textcfg $@
 
-#application_fpga.asc: application_fpga_par.json $(P)/data/uds.hex $(P)/data/udi.hex
-#	UDS_HEX="$(P)/data/uds.hex" \
-#	UDI_HEX="$(P)/data/udi.hex" \
-#	OUT_ASC=$@ \
-#	$(NEXTPNR_PATH)nextpnr-ecp5 \
-#		--85k \
-#		--package CSFBGA285 \
-#		--ignore-loops \
-#		--json $<
-#		--run tools/patch_uds_udi.py
+application_fpga.bin: application_fpga.config bram_fw.hex firmware.hex
+	$(ICESTORM_PATH)ecpbram -v -i $< -o $<.tmp -f bram_fw.hex -t firmware.hex
+	$(ICESTORM_PATH)ecppack $<.tmp $@
+	@-$(RM) $<.tmp
 
-application_fpga.bin: application_fpga.asc bram_fw.hex firmware.hex
-	$(ICESTORM_PATH)ecpbram -v -i application_fpga.asc -o application_fpga.asc.tmp -f bram_fw.hex -t firmware.hex
-#	$(ICESTORM_PATH)ecppack $<.tmp $@
-#	@-$(RM) $<.tmp
-
-application_fpga_testfw.bin: application_fpga.asc bram_fw.hex testfw.hex
-	$(ICESTORM_PATH)ecpbram -v bram_fw.hex testfw.hex < $< > $<.tmp
-#	$(ICESTORM_PATH)ecppack $<.tmp $@
-#	@-$(RM) $<.tmp
+application_fpga_testfw.bin: application_fpga.config bram_fw.hex testfw.hex
+	$(ICESTORM_PATH)ecpbram -v -i $< -o $<.tmp -f bram_fw.hex -t testfw.hex
+	$(ICESTORM_PATH)ecppack $<.tmp $@
+	@-$(RM) $<.tmp
 
 #-------------------------------------------------------------------
 # Build testbench simulation for the design
