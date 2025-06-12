@@ -253,7 +253,7 @@ testfw.elf: tkey-libs $(TESTFW_OBJS) $(P)/fw/tk1/firmware.lds
 
 # Generate a fake BRAM file that will be filled in later after place-n-route
 bram_fw.hex:
-	$(ICESTORM_PATH)icebram -v -g 32 $(BRAM_FW_SIZE) > $@
+	$(ICESTORM_PATH)ecpbram -v -g $@  -w 32 -d $(BRAM_FW_SIZE)
 
 firmware.hex: firmware.bin firmware_size_mismatch
 	python3 $(P)/tools/makehex.py $< $(BRAM_FW_SIZE) > $@
@@ -419,14 +419,14 @@ application_fpga.asc: synth.json $(P)/data/$(PIN_FILE)
 #		--run tools/patch_uds_udi.py
 
 application_fpga.bin: application_fpga.asc bram_fw.hex firmware.hex
-	$(ICESTORM_PATH)icebram -v bram_fw.hex firmware.hex < $< > $<.tmp
-	$(ICESTORM_PATH)icepack $<.tmp $@
-	@-$(RM) $<.tmp
+	$(ICESTORM_PATH)ecpbram -v -i application_fpga.asc -o application_fpga.asc.tmp -f bram_fw.hex -t firmware.hex
+#	$(ICESTORM_PATH)ecppack $<.tmp $@
+#	@-$(RM) $<.tmp
 
 application_fpga_testfw.bin: application_fpga.asc bram_fw.hex testfw.hex
-	$(ICESTORM_PATH)icebram -v bram_fw.hex testfw.hex < $< > $<.tmp
-	$(ICESTORM_PATH)icepack $<.tmp $@
-	@-$(RM) $<.tmp
+	$(ICESTORM_PATH)ecpbram -v bram_fw.hex testfw.hex < $< > $<.tmp
+#	$(ICESTORM_PATH)ecppack $<.tmp $@
+#	@-$(RM) $<.tmp
 
 #-------------------------------------------------------------------
 # Build testbench simulation for the design
