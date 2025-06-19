@@ -78,12 +78,12 @@ module clk_reset_gen #(
   //
   // Given the 12 MHz HFOSC clock set above, we get a final 24 MHz:
   //
-  // (12000000 * (63 + 1)) / (2^5 * (0 + 1)) = 24000000
+  // (12000000 * (63 + 1)) / (2^6 * (0 + 1)) = 12000000
   SB_PLL40_CORE #(
       .FEEDBACK_PATH("SIMPLE"),
       .DIVR(4'd0),  // DIVR =  0
       .DIVF(7'd63),  // DIVF = 63
-      .DIVQ(3'd5),  // DIVQ =  5
+      .DIVQ(3'd6),  // DIVQ =  6
       .FILTER_RANGE(3'b001)  // FILTER_RANGE = 1
   ) pll_inst (
       .RESETB(1'b1),
